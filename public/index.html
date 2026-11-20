@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة وتصنيع الستائر | أمر التشغيل وعروض الأسعار مع الربط بأودو</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- شريط التنقل العلوي -->
+  <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-50 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- الشعار والعنوان -->
+        <div class="flex items-center space-x-3 space-x-reverse">
+          <div class="w-10 h-10 rounded-lg bg-amber-400 text-indigo-950 flex items-center justify-center font-extrabold text-xl shadow">
+            ستائر
+          </div>
+          <div>
+            <h1 class="text-lg font-bold leading-tight">نظام تشغيل مصنع الستائر</h1>
+            <p class="text-xs text-indigo-200">النموذج الرقمي الذكي المتكامل مع أودو Odoo</p>
+          </div>
+        </div>
+
+        <!-- أزرار التبويبات -->
+        <nav class="hidden md:flex space-x-1 space-x-reverse">
+          <button onclick="switchTab('inspection')" id="nav-inspection" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold transition bg-indigo-800 text-white shadow flex items-center gap-1.5">
+            <span>📐</span> معاينة الموقع (كروكي)
+          </button>
+          <button onclick="switchTab('meeting')" id="nav-meeting" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold transition text-indigo-200 hover:text-white hover:bg-indigo-800">
+            📋 التسعير ولقاء العميل
+          </button>
+          <button onclick="switchTab('jobSheet')" id="nav-jobSheet" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold transition text-indigo-200 hover:text-white hover:bg-indigo-800">
+            🖨️ أمر التشغيل A4
+          </button>
+          <button onclick="switchTab('quoteSheet')" id="nav-quoteSheet" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold transition text-indigo-200 hover:text-white hover:bg-indigo-800">
+            💰 عرض السعر
+          </button>
+          <button onclick="switchTab('crm')" id="nav-crm" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold transition text-indigo-200 hover:text-white hover:bg-indigo-800">
+            📊 مراحل المبيعات والمهام
+          </button>
+          <button onclick="switchTab('odoo')" id="nav-odoo" class="tab-btn px-4 py-2 rounded-md text-sm font-semibold transition text-amber-300 hover:text-amber-100 hover:bg-indigo-800 flex items-center gap-1">
+            🔌 الربط مع أودو (APIs)
+          </button>
+        </nav>
+
+        <!-- الحالة والتجربة السريعة -->
+        <div class="flex items-center space-x-2 space-x-reverse">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-300">
+            <span class="w-2 h-2 mr-1 rounded-full bg-emerald-500 animate-pulse"></span>
+            APIs متصلة
+          </span>
+          <button onclick="loadSampleData()" class="text-xs bg-indigo-800 hover:bg-indigo-700 text-indigo-100 px-3 py-1.5 rounded border border-indigo-700 transition">
+            تحميل مثال جاهز
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- شريط تنقل الموبايل -->
+    <div class="md:hidden flex border-t border-indigo-800 bg-indigo-950 overflow-x-auto px-2 py-1 space-x-1 space-x-reverse text-xs">
+      <button onclick="switchTab('inspection')" class="tab-mobile-btn px-3 py-1.5 rounded whitespace-nowrap bg-indigo-800 text-white font-bold">معاينة الموقع</button>
+      <button onclick="switchTab('meeting')" class="tab-mobile-btn px-3 py-1.5 rounded whitespace-nowrap text-indigo-200">التسعير</button>
+      <button onclick="switchTab('jobSheet')" class="tab-mobile-btn px-3 py-1.5 rounded whitespace-nowrap text-indigo-200">أمر التشغيل</button>
+      <button onclick="switchTab('quoteSheet')" class="tab-mobile-btn px-3 py-1.5 rounded whitespace-nowrap text-indigo-200">عرض السعر</button>
+      <button onclick="switchTab('crm')" class="tab-mobile-btn px-3 py-1.5 rounded whitespace-nowrap text-indigo-200">الفرص</button>
+      <button onclick="switchTab('odoo')" class="tab-mobile-btn px-3 py-1.5 rounded whitespace-nowrap text-amber-300">أودو APIs</button>
+    </div>
+  </header>
+
+  <!-- محتوى التطبيق -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- ======================================================== -->
+    <!-- التبويب 0: معاينة الموقع - كروكي الأبعاد المعمارية (جديد) -->
+    <!-- ======================================================== -->
+    <section id="tab-inspection" class="tab-content block">
+      
+      <!-- شريط معلومات الموقع السريع -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+              <span class="text-2xl text-indigo-600">📐</span> كروكي معاينة الموقع ورفع المقاسات الميداني
+            </h2>
+            <p class="text-xs text-slate-500">أدخل المقاسات الـ 11 مباشرة على الرسم التوضيحي للحائط والشباك، وسيقوم النظام بتدقيقها واقتراح مقاسات الستارة المناسبة.</p>
+          </div>
+          
+          <!-- نوع الفتحة: شباك أم باب بلكونة -->
+          <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-lg border text-xs font-bold">
+            <span class="text-slate-600 px-2">نوع الفتحة:</span>
+            <button type="button" onclick="setWindowOpeningMode('window')" id="btn-mode-window" class="px-3 py-1.5 rounded-md bg-indigo-600 text-white shadow">
+              🪟 شباك عادي
+            </button>
+            <button type="button" onclick="setWindowOpeningMode('balcony')" id="btn-mode-balcony" class="px-3 py-1.5 rounded-md text-slate-600 hover:text-slate-900">
+              🚪 باب بلكونة / شرفة
+            </button>
+          </div>
+        </div>
+
+        <!-- حقول العميل والغرفة للمعاينة -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4 pt-4 border-t text-sm">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">اسم العميل *</label>
+            <input type="text" id="insp_client_name" value="م. أحمد عبد الرحمن" oninput="syncClientDataToMeeting()" class="w-full px-3 py-1.5 border rounded-lg">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">رقم الهاتف *</label>
+            <input type="tel" id="insp_client_phone" value="01012345678" oninput="syncClientDataToMeeting()" class="w-full px-3 py-1.5 border rounded-lg">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">اسم الغرفة / الشباك</label>
+            <input type="text" id="insp_room_name" value="غرفة النوم الرئيسية" oninput="syncClientDataToMeeting()" class="w-full px-3 py-1.5 border rounded-lg">
+          </div>
+        </div>
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- الرسم الكروكي البصري التفاعلي للحائط والمقاسات الـ 11 -->
+      <!-- ======================================================== -->
+      <div class="bg-white rounded-xl shadow-lg border border-slate-200 p-6 mb-6">
+        
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">واجهة الحائط المعمارية (Elevation View)</span>
+            <span id="insp_consistency_badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+              الأبعاد متطابقة ✓
+            </span>
+          </div>
+          <button type="button" onclick="resetInspectionDefaults()" class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold">
+            استعادة المقاسات القياسية
+          </button>
+        </div>
+
+        <!-- الحاوية المعمارية للحائط -->
+        <div class="wall-sketch-canvas w-full min-h-[580px] p-6 flex flex-col justify-between relative overflow-hidden select-none">
+          
+          <!-- خط السقف العلوي وبيت الستارة -->
+          <div class="w-full border-b-4 border-slate-800 pt-2 pb-1 relative">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+              <span class="flex items-center gap-1">🏛️ خط السقف الخرساني</span>
+              
+              <!-- خانة 5: عرض بيت الستارة + خانة 10 و 11: السقوط والعمق -->
+              <div class="ceiling-pocket-visual px-4 py-2 flex items-center gap-4 shadow-sm">
+                <div class="flex items-center gap-1.5">
+                  <span class="croquis-label">٥. عرض بيت الستارة:</span>
+                  <input type="number" id="insp_pocket_width" value="300" oninput="recalculateInspection()" class="croquis-input w-20 py-1 text-sm">
+                  <span class="text-xs text-amber-900 font-bold">سم</span>
+                </div>
+                <div class="border-r border-amber-400 pr-3 flex items-center gap-1.5">
+                  <span class="croquis-label">١٠. السقوط:</span>
+                  <input type="number" id="insp_pocket_drop" value="15" oninput="recalculateInspection()" class="croquis-input w-16 py-1 text-sm">
+                  <span class="text-xs text-amber-900 font-bold">سم</span>
+                </div>
+                <div class="border-r border-amber-400 pr-3 flex items-center gap-1.5">
+                  <span class="croquis-label">١١. العمق:</span>
+                  <input type="number" id="insp_pocket_depth" value="25" oninput="recalculateInspection()" class="croquis-input w-16 py-1 text-sm">
+                  <span class="text-xs text-amber-900 font-bold">سم</span>
+                </div>
+              </div>
+
+              <span>زاوية السقف</span>
+            </div>
+          </div>
+
+          <!-- مساحة الحائط والشباك والمقاسات الرأسية والأفقية -->
+          <div class="flex-1 flex my-4 relative">
+
+            <!-- الجانب الأيمن من الحائط: بعد الارتفاع الكلي (خانة 6) -->
+            <div class="w-24 flex flex-col justify-between items-center border-l-2 border-dashed border-sky-400 px-2 py-4 relative">
+              <span class="text-[10px] font-bold text-sky-800 writing-vertical">٦. الارتفاع الكلي</span>
+              <div class="my-auto text-center">
+                <label class="block text-[11px] font-black text-sky-900 mb-1">الارتفاع الكلي</label>
+                <input type="number" id="insp_total_height" value="280" oninput="recalculateInspection()" class="croquis-input w-20 py-1.5 text-base text-indigo-900 bg-amber-50">
+                <span class="block text-[10px] text-slate-500 mt-1">سم</span>
+              </div>
+              <div class="text-[10px] text-slate-400 font-mono" id="insp_vert_sum_hint">مجموع: 280</div>
+            </div>
+
+            <!-- قلب الحائط: اليمين + الشباك في الوسط + اليسار -->
+            <div class="flex-1 flex flex-col justify-between px-4">
+              
+              <!-- خانة 8: أعلى الشباك (بين السقف وحلق الشباك العلوي) -->
+              <div class="flex justify-center items-center py-2">
+                <div class="flex items-center gap-2 bg-white/90 px-3 py-1 rounded-full border border-sky-300 shadow-sm">
+                  <span class="text-sky-500 font-bold">↕</span>
+                  <span class="croquis-label">٨. أعلى الشباك (حتى السقف):</span>
+                  <input type="number" id="insp_above_window" value="50" oninput="recalculateInspection()" class="croquis-input w-16 py-1 text-sm">
+                  <span class="text-xs text-slate-600 font-bold">سم</span>
+                </div>
+              </div>
+
+              <!-- صف الفتحة (يمين الشباك + الشباك + يسار الشباك) -->
+              <div class="flex items-center justify-between gap-4 my-2">
+                
+                <!-- خانة 1: يمين الشباك (المسافة من الشباك للحائط الأيمن) -->
+                <div class="flex-1 flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50/50">
+                  <span class="croquis-label mb-1">١. يمين الشباك:</span>
+                  <div class="flex items-center gap-1">
+                    <span class="text-sky-600 text-sm">◀</span>
+                    <input type="number" id="insp_right_width" value="75" oninput="recalculateInspection()" class="croquis-input w-20 py-1.5 text-sm">
+                    <span class="text-sky-600 text-sm">▶</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500 mt-1">سم حتى زاوية اليمين</span>
+                </div>
+
+                <!-- الفتحة في المنتصف: الشباك / باب البلكونة -->
+                <div id="window-visual-box" class="w-72 min-h-[220px] window-glass flex flex-col justify-between p-3 relative shadow-inner">
+                  
+                  <!-- ترويسة الشباك وعرض الشباك (خانة 2) -->
+                  <div class="text-center z-10">
+                    <div class="inline-flex items-center gap-1 bg-white/95 px-2.5 py-1 rounded-md border border-slate-400 shadow-sm">
+                      <span class="croquis-label">٢. عرض الشباك:</span>
+                      <input type="number" id="insp_window_width" value="150" oninput="recalculateInspection()" class="croquis-input w-20 py-1 text-base text-indigo-700">
+                      <span class="text-xs font-bold text-slate-700">سم</span>
+                    </div>
+                  </div>
+
+                  <!-- شكل زجاج الشباك ومقبض الباب / النافذة -->
+                  <div class="flex-1 flex items-center justify-center relative my-2">
+                    <div class="w-full h-full border border-sky-300 grid grid-cols-2 gap-1 p-1">
+                      <div class="border border-white/60 bg-sky-100/30 flex items-center justify-end pr-2">
+                        <div class="w-1.5 h-6 bg-slate-600 rounded"></div>
+                      </div>
+                      <div class="border border-white/60 bg-sky-100/30"></div>
+                    </div>
+
+                    <!-- خانة 7: ارتفاع الشباك (على الجانب الأيسر للنافذة) -->
+                    <div class="absolute -left-12 top-1/2 -translate-y-1/2 flex flex-col items-center z-10">
+                      <span class="croquis-label text-[9px] mb-0.5">٧. ارتفاع الشباك</span>
+                      <div class="flex items-center gap-0.5">
+                        <input type="number" id="insp_window_height" value="140" oninput="recalculateInspection()" class="croquis-input w-16 py-1 text-sm">
+                      </div>
+                      <span class="text-[10px] text-slate-500">سم</span>
+                    </div>
+                  </div>
+
+                  <!-- جلسة الشباك السفلية -->
+                  <div class="window-sill" id="window-sill-bar"></div>
+                </div>
+
+                <!-- خانة 3: يسار الشباك (المسافة من الشباك للحائط الأيسر) -->
+                <div class="flex-1 flex flex-col items-center justify-center p-3 border-2 border-dashed border-slate-300 rounded-lg bg-slate-50/50">
+                  <span class="croquis-label mb-1">٣. يسار الشباك:</span>
+                  <div class="flex items-center gap-1">
+                    <span class="text-sky-600 text-sm">◀</span>
+                    <input type="number" id="insp_left_width" value="75" oninput="recalculateInspection()" class="croquis-input w-20 py-1.5 text-sm">
+                    <span class="text-sky-600 text-sm">▶</span>
+                  </div>
+                  <span class="text-[10px] text-slate-500 mt-1">سم حتى زاوية اليسار</span>
+                </div>
+
+              </div>
+
+              <!-- خانة 9: أسفل الشباك (جلسة الشباك حتى الأرضية) -->
+              <div class="flex justify-center items-center py-2" id="below-window-container">
+                <div class="flex items-center gap-2 bg-white/90 px-3 py-1 rounded-full border border-sky-300 shadow-sm">
+                  <span class="text-sky-500 font-bold">↕</span>
+                  <span class="croquis-label">٩. أسفل الشباك (الجلسة للأرض):</span>
+                  <input type="number" id="insp_below_window" value="90" oninput="recalculateInspection()" class="croquis-input w-16 py-1 text-sm">
+                  <span class="text-xs text-slate-600 font-bold">سم</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          <!-- خط الأرضية السفلي والعرض الكلي للحائط (خانة 4) -->
+          <div class="w-full border-t-4 border-amber-900 bg-amber-50/80 p-3 rounded-b-lg">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <span class="text-xs font-bold text-amber-950 flex items-center gap-1">
+                🪵 خط الأرضية / الباركيه
+              </span>
+              
+              <!-- خانة 4: العرض الكلي للحائط -->
+              <div class="flex items-center gap-2 bg-white px-4 py-2 rounded-lg border-2 border-indigo-600 shadow">
+                <span class="text-indigo-700 text-sm">◀</span>
+                <span class="text-xs font-black text-indigo-950">٤. العرض الكلي للحائط:</span>
+                <input type="number" id="insp_total_width" value="300" oninput="recalculateInspection()" class="croquis-input w-24 py-1.5 text-base text-indigo-900 bg-indigo-50 font-black">
+                <span class="text-xs font-bold text-slate-700">سم</span>
+                <span class="text-indigo-700 text-sm">▶</span>
+              </div>
+
+              <div class="text-xs text-slate-600 font-mono" id="insp_horiz_sum_hint">
+                المجموع الأفقي: 75 + 150 + 75 = 300 سم
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ملاحظات العوائق بالموقع -->
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div class="md:col-span-2">
+            <label class="block font-bold text-slate-700 mb-1">ملاحظات عوائق الموقع (تكييف، مفاتيح إنارة، فتحات تهوية):</label>
+            <input type="text" id="insp_obstacles" value="لا توجد عوائق، يوجد مفتاح إنارة على بعد 15 سم من يمين الشباك" class="w-full px-3 py-2 border rounded-lg" placeholder="اكتب أي عوائق في مسار حركة الستارة...">
+          </div>
+          <div class="flex items-end">
+            <button type="button" onclick="saveInspectionToDB()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2 px-4 rounded-lg shadow text-xs flex items-center justify-center gap-1.5">
+              <span>💾</span> حفظ بيانات المعاينة في السجل
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ======================================================== -->
+      <!-- بطاقة النتائج الذكية واعتماد المقاسات للتسعير والتفصيل -->
+      <!-- ======================================================== -->
+      <div class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white rounded-xl shadow-xl p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          
+          <div>
+            <span class="text-xs text-amber-300 font-bold uppercase tracking-wider block mb-1">
+              ✨ التوليد الذكي لمقاسات الستارة من واقع المعاينة
+            </span>
+            <h3 class="text-xl font-black">المقاسات المعتمدة لتفصيل الستارة</h3>
+            <p class="text-xs text-indigo-200 mt-1">تم احتساب أبعاد الستارة تلقائياً بناءً على بيت الستارة، الخلوص الأرضي، وتغطية الشباك.</p>
+          </div>
+
+          <!-- المقاسين الرئيسيين للستارة -->
+          <div class="flex items-center gap-6 bg-white/10 px-6 py-3 rounded-xl border border-white/20">
+            <div class="text-center">
+              <span class="text-xs text-indigo-200 block mb-0.5">عرض الستارة المقترح:</span>
+              <span class="text-2xl font-black text-amber-300" id="suggested_curtain_w_badge">300 سم</span>
+              <span class="text-[10px] text-indigo-300 block" id="suggested_w_reason">(كامل عرض بيت الستارة)</span>
+            </div>
+            <div class="border-r border-white/20 h-10"></div>
+            <div class="text-center">
+              <span class="text-xs text-indigo-200 block mb-0.5">ارتفاع الستارة المقترح:</span>
+              <span class="text-2xl font-black text-amber-300" id="suggested_curtain_h_badge">263 سم</span>
+              <span class="text-[10px] text-indigo-300 block" id="suggested_h_reason">(الارتفاع الكلي 280 - سقوط 15 - خلوص 2)</span>
+            </div>
+          </div>
+
+          <!-- زر النقل المباشر للمرحلة التالية -->
+          <div>
+            <button type="button" onclick="transferInspectionToCurtainPricing()" class="bg-amber-400 hover:bg-amber-300 text-indigo-950 font-black px-6 py-3.5 rounded-xl shadow-lg transition transform hover:scale-105 flex items-center gap-2 text-sm">
+              <span>➔</span> اعتماد المقاسات والبدء في التسعير واختيار الأقمشة
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- التبويب 1: شاشة لقاء العميل السريعة (شاشة الموبايل والمكتب) -->
+    <!-- ======================================================== -->
+    <section id="tab-meeting" class="tab-content hidden">
+      
+      <!-- شريط الخطوتين -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3 space-x-reverse">
+            <button onclick="setMeetingStep(1)" id="step-btn-1" class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm bg-indigo-50 text-indigo-700 border border-indigo-200">
+              <span class="w-6 h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs">1</span>
+              المرحلة 1: التسعير والأمتار المباشرة
+            </button>
+            <button onclick="setMeetingStep(2)" id="step-btn-2" class="flex items-center gap-2 px-4 py-2 rounded-lg font-bold text-sm text-slate-500 hover:bg-slate-50 border border-transparent">
+              <span class="w-6 h-6 rounded-full bg-slate-300 text-slate-700 flex items-center justify-center text-xs">2</span>
+              المرحلة 2: تفاصيل التشغيل والرسم التوضيحي
+            </button>
+          </div>
+          <div class="flex gap-2">
+            <button onclick="saveAndGenerateJob()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-lg shadow transition flex items-center gap-1">
+              💾 حفظ وإصدار أمر التشغيل
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- محتوى المرحلة 1: التسعير والأمتار -->
+      <div id="meeting-step-1">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+          <!-- العمود الأيمن والأوسط: المقاسات والأقمشة والإكسسوار -->
+          <div class="lg:col-span-2 space-y-6">
+
+            <!-- 1. البيانات الأساسية السريعة -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+              <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <span class="text-indigo-600">👤</span> بيانات العميل والغرفة
+              </h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">اسم العميل *</label>
+                  <input type="text" id="client_name" value="م. أحمد عبد الرحمن" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="الاسم ثلاثي">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">رقم التليفون *</label>
+                  <input type="tel" id="client_phone" value="01012345678" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="010xxxxxxxx">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">اسم الغرفة / الشباك</label>
+                  <input type="text" id="room_name" value="غرفة النوم الرئيسية" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">اسم البائع</label>
+                  <input type="text" id="seller_name" value="محمد علي" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. المقاسات والميل وخصائص السقف -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+              <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2 border-b pb-2">
+                <span class="text-indigo-600">📐</span> المقاسات وخيارات التثبيت
+              </h2>
+              
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm mb-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">العرض (سم) *</label>
+                  <input type="number" id="room_width" value="300" oninput="triggerRecalculate()" class="w-full px-3 py-2 border rounded-lg text-lg font-bold text-indigo-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">الارتفاع (سم) *</label>
+                  <input type="number" id="room_height" value="250" oninput="triggerRecalculate()" class="w-full px-3 py-2 border rounded-lg text-lg font-bold text-indigo-700 focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">ميل في الارتفاع؟</label>
+                  <select id="has_incline" onchange="toggleInclineFields(); triggerRecalculate();" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                    <option value="false">لا يوجد ميل (مستوي)</option>
+                    <option value="true">يوجد ميل</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- حقول الميل إن وجدت -->
+              <div id="incline_fields" class="hidden grid grid-cols-3 gap-4 p-3 bg-amber-50 rounded-lg border border-amber-200 mb-4 text-sm">
+                <div>
+                  <label class="block text-xs font-semibold text-amber-800 mb-1">ارتفاع يمين (سم)</label>
+                  <input type="number" id="incline_right" value="290" oninput="triggerRecalculate()" class="w-full px-2 py-1.5 border rounded bg-white">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-amber-800 mb-1">ارتفاع منتصف (سم)</label>
+                  <input type="number" id="incline_center" value="270" oninput="triggerRecalculate()" class="w-full px-2 py-1.5 border rounded bg-white">
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-amber-800 mb-1">ارتفاع يسار (سم)</label>
+                  <input type="number" id="incline_left" value="250" oninput="triggerRecalculate()" class="w-full px-2 py-1.5 border rounded bg-white">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">التركيب على</label>
+                  <select id="installation_on" onchange="triggerRecalculate()" class="w-full px-3 py-2 border rounded-lg">
+                    <option value="سقف">سقف</option>
+                    <option value="حائط">حائط</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">خامة السقف</label>
+                  <select id="ceiling_material" onchange="triggerRecalculate()" class="w-full px-3 py-2 border rounded-lg">
+                    <option value="جبس">جبس</option>
+                    <option value="خرسانة">خرسانة</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-600 mb-1">شكل السقف</label>
+                  <select id="ceiling_shape" onchange="triggerRecalculate()" class="w-full px-3 py-2 border rounded-lg">
+                    <option value="بيت ستارة">بيت ستارة</option>
+                    <option value="سقف عادي">سقف عادي</option>
+                    <option value="كورنيشة">كورنيشة</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- 3. طبقات القماش (حتى 5 طبقات) مع الحساب الفوري -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+              <div class="flex items-center justify-between mb-4 border-b pb-2">
+                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                  <span class="text-indigo-600">🧵</span> طبقات القماش (المحسوبة تلقائياً)
+                </h2>
+                <div class="flex items-center gap-2" id="layer-tabs">
+                  <!-- أزرار الطبقات تضاف هنا -->
+                </div>
+              </div>
+
+              <!-- بطاقة الطبقة النشطة -->
+              <div id="active-layer-form" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-sm">
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">نوع القماش</label>
+                    <select id="layer_fabric_type" onchange="updateCurrentLayer()" class="w-full px-2.5 py-1.5 border rounded-lg">
+                      <option value="تقيل">تقيل</option>
+                      <option value="خفيف">خفيف</option>
+                      <option value="بلاك">بلاك</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">الصنف</label>
+                    <input type="text" id="layer_category" oninput="updateCurrentLayer()" value="مخمل قطيفة فاخر" class="w-full px-2.5 py-1.5 border rounded-lg">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">الكود</label>
+                    <input type="text" id="layer_code" oninput="updateCurrentLayer()" value="VEL-304" class="w-full px-2.5 py-1.5 border rounded-lg">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">نوع التفصيل *</label>
+                    <select id="layer_tailoring_type" onchange="updateCurrentLayer()" class="w-full px-2.5 py-1.5 border rounded-lg font-bold text-indigo-700">
+                      <option value="ويفي">ويفي (تموجات متساوية)</option>
+                      <option value="عادي">عادي (كشكشة علوية)</option>
+                      <option value="كالونات">كالونات</option>
+                      <option value="حلقات">حلقات (ماسورة)</option>
+                      <option value="كسرات">كسرات</option>
+                      <option value="مفرود">مفرود</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">عرض الرول *</label>
+                    <select id="layer_roll_width" onchange="updateCurrentLayer()" class="w-full px-2.5 py-1.5 border rounded-lg font-bold">
+                      <option value="عريض">عريض</option>
+                      <option value="عرض">عرض (طبيعي)</option>
+                      <option value="قلب ط">قلب ط</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">زيادة الارتفاع (سم)</label>
+                    <input type="number" id="layer_height_add" oninput="updateCurrentLayer()" value="25" class="w-full px-2.5 py-1.5 border rounded-lg">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">نوع الريل</label>
+                    <select id="layer_rail_type" onchange="updateCurrentLayer()" class="w-full px-2.5 py-1.5 border rounded-lg">
+                      <option value="عادي">حسب نوع التفصيل</option>
+                      <option value="ريل كهربائي">ريل كهربائي (موتور)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">اللون</label>
+                    <input type="text" id="layer_color" oninput="updateCurrentLayer()" value="تاوبي #a08a76" class="w-full px-2.5 py-1.5 border rounded-lg">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">سعر المتر (ج.م)</label>
+                    <input type="number" id="layer_price" oninput="updateCurrentLayer()" value="650" class="w-full px-2.5 py-1.5 border rounded-lg">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">سعر التفصيل للمتر (ج.م)</label>
+                    <input type="number" id="layer_tailoring_price" oninput="updateCurrentLayer()" value="60" class="w-full px-2.5 py-1.5 border rounded-lg">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">خصم القماش %</label>
+                    <input type="number" id="layer_discount" oninput="updateCurrentLayer()" value="0" class="w-full px-2.5 py-1.5 border rounded-lg">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">شكل الستارة</label>
+                    <select id="layer_curtain_shape" onchange="updateCurrentLayer()" class="w-full px-2.5 py-1.5 border rounded-lg">
+                      <option value="عادية">عادية</option>
+                      <option value="ملموم">ملموم (مربوطة بحامل)</option>
+                    </select>
+                  </div>
+                </div>
+
+                <!-- نتيجة الحساب الفوري للطبقة مع سطر المعادلة -->
+                <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-3 text-indigo-900 flex flex-wrap items-center justify-between text-sm">
+                  <div class="flex items-center gap-4">
+                    <div>
+                      <span class="text-xs text-indigo-600 block">عدد العروض المحسوب:</span>
+                      <span class="text-base font-extrabold" id="calc_layer_widths">--</span>
+                    </div>
+                    <div class="border-r border-indigo-200 pr-4">
+                      <span class="text-xs text-indigo-600 block">إجمالي أمتار القماش:</span>
+                      <span class="text-lg font-black text-indigo-700" id="calc_layer_meters">-- م</span>
+                    </div>
+                    <div class="border-r border-indigo-200 pr-4">
+                      <span class="text-xs text-indigo-600 block">تكلفة القماش والتفصيل:</span>
+                      <span class="text-base font-extrabold text-emerald-700" id="calc_layer_cost">-- ج.م</span>
+                    </div>
+                  </div>
+                  <div class="text-xs text-indigo-700 mt-2 sm:mt-0 font-mono bg-white px-2 py-1 rounded border border-indigo-200" id="calc_layer_formula">
+                    --
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. جدول الإكسسوارات المحسوبة تلقائياً مع إمكانية التعديل -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+              <div class="flex items-center justify-between mb-3 border-b pb-2">
+                <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                  <span class="text-indigo-600">🔩</span> جدول الإكسسوارات (مولد تلقائياً حسب القواعد)
+                </h2>
+                <button onclick="addManualAccessory()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 px-2.5 py-1 rounded border font-semibold">
+                  + إضافة بند يدوي
+                </button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-sm text-right">
+                  <thead>
+                    <tr class="bg-slate-100 text-slate-700 text-xs">
+                      <th class="p-2">البند</th>
+                      <th class="p-2">الكود</th>
+                      <th class="p-2">الكمية</th>
+                      <th class="p-2">الوحدة</th>
+                      <th class="p-2">سعر الوحدة</th>
+                      <th class="p-2">الإجمالي</th>
+                      <th class="p-2 text-center">النوع</th>
+                    </tr>
+                  </thead>
+                  <tbody id="accessories-table-body" class="divide-y divide-slate-100">
+                    <!-- تعبأ ديناميكياً -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- العمود الأيسر: إرشادات بيت الستارة والملخص الحي الثابت -->
+          <div class="space-y-6">
+
+            <!-- مؤشر إرشادات بيت الستارة (Section 8.4) -->
+            <div id="pocket-box" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+              <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-2 border-b pb-2">
+                <span>📏</span> كفاية عمق وارتفاع بيت الستارة
+              </h3>
+              <div class="space-y-3 text-xs">
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-slate-500 mb-1">العمق الفعلي (سم)</label>
+                    <input type="number" id="pocket_depth" value="25" oninput="triggerRecalculate()" class="w-full px-2 py-1 border rounded font-bold">
+                  </div>
+                  <div>
+                    <label class="block text-slate-500 mb-1">الارتفاع الفعلي (سم)</label>
+                    <input type="number" id="pocket_height" value="15" oninput="triggerRecalculate()" class="w-full px-2 py-1 border rounded font-bold">
+                  </div>
+                </div>
+
+                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
+                  <div class="flex justify-between items-center">
+                    <span class="text-slate-600">حالة العمق للطبقات:</span>
+                    <span id="pocket_status_badge" class="px-2 py-0.5 rounded font-bold text-xs bg-emerald-100 text-emerald-800">
+                      كاف ✓
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-slate-500" id="pocket_details_text">
+                    العمق المطلوب للطبقات: 18 - 22 سم
+                  </div>
+                  <div class="border-t pt-2 flex justify-between items-center">
+                    <span class="text-slate-600">شريط الستارة:</span>
+                    <span id="tape_visibility_badge" class="font-bold text-indigo-700">
+                      مخفي داخل البيت
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ملخص الفاتورة الحي الدائم -->
+            <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-xl shadow-lg p-5 sticky top-20">
+              <h3 class="text-base font-extrabold mb-3 flex items-center justify-between border-b border-indigo-700 pb-2">
+                <span>ملخص التكلفة الحية</span>
+                <span class="text-xs bg-indigo-700 px-2 py-0.5 rounded text-indigo-200">فوري</span>
+              </h3>
+              
+              <div class="space-y-2 text-sm text-indigo-100">
+                <div class="flex justify-between">
+                  <span>إجمالي القماش:</span>
+                  <span id="live_fabric_total" class="font-bold text-white">0 ج.م</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>إجمالي التفصيل:</span>
+                  <span id="live_tailoring_total" class="font-bold text-white">0 ج.م</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>إجمالي الإكسسوار:</span>
+                  <span id="live_acc_total" class="font-bold text-white">0 ج.م</span>
+                </div>
+                <div class="flex justify-between">
+                  <span>إجمالي العقادة:</span>
+                  <span id="live_tassel_total" class="font-bold text-white">0 ج.م</span>
+                </div>
+                
+                <div class="border-t border-indigo-700 pt-2 flex justify-between text-base font-bold text-amber-300">
+                  <span>إجمالي الغرفة:</span>
+                  <span id="live_room_total">0 ج.م</span>
+                </div>
+              </div>
+
+              <!-- أزرار الإجراء السريع -->
+              <div class="mt-5 space-y-2">
+                <button onclick="setMeetingStep(2)" class="w-full bg-amber-400 hover:bg-amber-300 text-indigo-950 font-bold py-2 rounded-lg text-sm shadow transition">
+                  التالي: تفاصيل التشغيل والرسم ➔
+                </button>
+                <button onclick="saveAndGenerateJob()" class="w-full bg-indigo-700 hover:bg-indigo-600 text-white font-bold py-2 rounded-lg text-sm shadow transition">
+                  💾 حفظ وإصدار أمر التشغيل A4
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- محتوى المرحلة 2: تفاصيل التشغيل والرسم التوضيحي -->
+      <div id="meeting-step-2" class="hidden">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- مساحة الرسم التوضيحي للموديل (Canvas) مطابق للورقة -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <div class="flex items-center justify-between mb-3 border-b pb-2">
+              <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                <span>🎨</span> رسم توضيحي للموديل (ارسم بالماوس أو القلم)
+              </h2>
+              <div class="flex gap-2">
+                <button onclick="clearCanvas()" class="text-xs bg-rose-50 text-rose-700 hover:bg-rose-100 px-3 py-1 rounded border border-rose-200 font-semibold">
+                  مسح اللوحة
+                </button>
+              </div>
+            </div>
+            
+            <p class="text-xs text-slate-500 mb-2">ارسم شكل الموديل أو تقسيمات الطبقات، وستظهر تلقائياً في خانة الرسم بأمر التشغيل المطبوع A4.</p>
+            
+            <div class="relative">
+              <canvas id="sketchCanvas" width="500" height="320" class="w-full h-72 border bg-white rounded-lg"></canvas>
+            </div>
+          </div>
+
+          <!-- تفاصيل التشغيل الإضافية -->
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+            <h2 class="text-base font-bold text-slate-800 flex items-center gap-2 border-b pb-2">
+              <span>⚙️</span> خيارات التشغيل للمصنع
+            </h2>
+
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">نوع فتح الشباك</label>
+                <select id="window_open_type" class="w-full px-3 py-2 border rounded-lg">
+                  <option value="جرار">جرار</option>
+                  <option value="مفصلي">مفصلي</option>
+                  <option value="ثابت">ثابت</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">تاريخ التسليم المتوقع</label>
+                <input type="date" id="expected_delivery" class="w-full px-3 py-2 border rounded-lg">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">نوع أمر التشغيل</label>
+                <select id="order_type" class="w-full px-3 py-2 border rounded-lg">
+                  <option value="جديد">جديد</option>
+                  <option value="استكمال">استكمال</option>
+                  <option value="تعديل">تعديل</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">مرحلة العمل</label>
+                <select id="work_stage" class="w-full px-3 py-2 border rounded-lg">
+                  <option value="تركيب">تركيب</option>
+                  <option value="تسليم">تسليم</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">البلتكالة (النوع)</label>
+                <select id="pelmet_type" class="w-full px-3 py-2 border rounded-lg">
+                  <option value="تشييد بوكس">تشييد بوكس</option>
+                  <option value="اويبة">اويبة</option>
+                  <option value="استنلس">استنلس</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-600 mb-1">أمتار البلتكالة</label>
+                <input type="number" id="pelmet_meters" value="3.2" step="0.1" class="w-full px-3 py-2 border rounded-lg">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-600 mb-1">ملاحظات المكتب الفني</label>
+              <textarea id="technical_notes" rows="4" class="w-full px-3 py-2 border rounded-lg text-sm" placeholder="أي تعليمات خاصة للمصنع والفنيين..."></textarea>
+            </div>
+
+            <div class="flex gap-3 pt-3">
+              <button onclick="setMeetingStep(1)" class="w-1/3 bg-slate-100 hover:bg-slate-200 text-slate-700 py-2.5 rounded-lg text-sm font-bold">
+                ⬅ العودة للتسعير
+              </button>
+              <button onclick="saveAndGenerateJob()" class="w-2/3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2.5 rounded-lg text-sm shadow">
+                💾 حفظ وتوليد أمر التشغيل للطباعة
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- التبويب 2: أمر التشغيل المطبوع A4 (مطابق للورقة تماماً!) -->
+    <!-- ======================================================== -->
+    <section id="tab-jobSheet" class="tab-content hidden">
+      
+      <!-- شريط تحكم الطباعة -->
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6 flex items-center justify-between no-print">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🖨️</span>
+          <div>
+            <h2 class="font-bold text-slate-800">أمر تشغيل مصنع الستائر (ورقة A4)</h2>
+            <p class="text-xs text-slate-500">تم تصميم هذا النموذج ليتطابق مع الورقة المعتمدة للمصنع بنسبة 100% وبدون إظهار الأسعار.</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2 rounded-lg text-sm shadow flex items-center gap-2">
+            <span>🖨️</span> طباعة أمر التشغيل A4
+          </button>
+        </div>
+      </div>
+
+      <!-- الورقة المطبوعة (A4 Container) -->
+      <div class="page-a4 factory-sheet max-w-4xl mx-auto bg-white shadow-xl p-8 border-2 border-slate-900 rounded-lg">
+        
+        <!-- رأسية أمر التشغيل (طابق الورقة الأصلية) -->
+        <div class="flex justify-between items-start border-b-2 border-slate-900 pb-3 mb-3">
+          
+          <!-- خانات الحالة يسار -->
+          <div class="text-xs font-bold space-y-1 w-28">
+            <label class="flex items-center gap-1.5"><input type="checkbox" id="sheet_chk_new" checked> جديد</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" id="sheet_chk_complete"> استكمال</label>
+            <label class="flex items-center gap-1.5"><input type="checkbox" id="sheet_chk_edit"> تعديل</label>
+          </div>
+
+          <!-- العنوان في المنتصف داخل إطار بيضاوي -->
+          <div class="text-center">
+            <div class="sheet-box-title">
+              أمر تشغيل مصنع الستائر
+            </div>
+            <div class="text-xs text-slate-600 font-mono mt-1" id="sheet_check_number">رقم الشيك: CHK-9041</div>
+          </div>
+
+          <!-- خانات التركيب وشباك رقم -->
+          <div class="flex gap-4">
+            <div class="text-xs font-bold space-y-1">
+              <label class="flex items-center gap-1.5"><input type="checkbox" id="sheet_chk_install" checked> تركيب</label>
+              <label class="flex items-center gap-1.5"><input type="checkbox" id="sheet_chk_deliver"> تسليم</label>
+            </div>
+            <div class="border-2 border-slate-900 rounded p-1 text-center w-20">
+              <span class="text-[10px] font-bold block border-b border-slate-900">شباك رقم</span>
+              <span class="text-sm font-black" id="sheet_window_num">1</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- بيانات العميل والتسليم (سطور منقطة مطابقة للورقة) -->
+        <div class="grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs mb-3 border-b pb-3">
+          <div class="flex"><span class="font-bold w-20">التاريخ:</span> <span id="sheet_date" class="border-b border-dotted border-slate-700 flex-1"></span></div>
+          <div class="flex"><span class="font-bold w-20">اسم الفرع:</span> <span id="sheet_branch" class="border-b border-dotted border-slate-700 flex-1">فرع المعادي</span></div>
+          <div class="flex"><span class="font-bold w-20">اسم العميل:</span> <span id="sheet_client_name" class="border-b border-dotted border-slate-700 flex-1 font-bold"></span></div>
+          <div class="flex"><span class="font-bold w-20">اسم البائع:</span> <span id="sheet_seller_name" class="border-b border-dotted border-slate-700 flex-1"></span></div>
+          <div class="flex"><span class="font-bold w-20">رقم التليفون:</span> <span id="sheet_client_phone" class="border-b border-dotted border-slate-700 flex-1 font-mono"></span></div>
+          <div class="flex"><span class="font-bold w-20">تاريخ التسليم:</span> <span id="sheet_due_date" class="border-b border-dotted border-slate-700 flex-1 font-bold"></span></div>
+          <div class="flex"><span class="font-bold w-20">اسم الغرفة:</span> <span id="sheet_room_name" class="border-b border-dotted border-slate-700 flex-1"></span></div>
+          <div class="flex"><span class="font-bold w-20">الموقع:</span> <span id="sheet_location" class="border-b border-dotted border-slate-700 flex-1">التجمع الخامس - كمبوند ميفيدا</span></div>
+        </div>
+
+        <!-- الرسم التوضيحي للموديل + المقاسات والخيارات -->
+        <div class="grid grid-cols-2 gap-3 mb-3">
+          <!-- مربع الرسم التوضيحي -->
+          <div class="border-2 border-slate-900 rounded p-2 text-center h-44 flex flex-col justify-between">
+            <span class="text-xs font-bold block text-right border-b pb-1">رسم توضيحي للموديل:</span>
+            <div class="flex-1 flex items-center justify-center overflow-hidden">
+              <img id="sheet_sketch_img" src="" class="max-h-36 max-w-full object-contain hidden" alt="رسم الموديل">
+              <span id="sheet_no_sketch_text" class="text-xs text-slate-400">لا يوجد رسم توضيحي مدخل</span>
+            </div>
+          </div>
+
+          <!-- المقاسات والديكور والقناع -->
+          <div class="border-2 border-slate-900 rounded p-2 text-xs flex flex-col justify-between">
+            <div class="grid grid-cols-2 gap-2 text-center">
+              <div class="border border-slate-700 rounded p-1 bg-slate-50">
+                <span class="block text-[11px] font-bold">العرض</span>
+                <span id="sheet_width" class="text-base font-black">300 سم</span>
+              </div>
+              <div class="border border-slate-700 rounded p-1 bg-slate-50">
+                <span class="block text-[11px] font-bold">الارتفاع</span>
+                <span id="sheet_height" class="text-base font-black">250 سم</span>
+              </div>
+            </div>
+
+            <div class="mt-2 space-y-1">
+              <div class="flex items-center justify-between border-b pb-1">
+                <span class="font-bold">نوع القناع:</span>
+                <span class="flex gap-2 text-[11px]">
+                  <label><input type="radio" name="sheet_mask" id="mask_hinge"> مفصلي</label>
+                  <label><input type="radio" name="sheet_mask" id="mask_slide" checked> جرار</label>
+                  <label><input type="radio" name="sheet_mask" id="mask_fixed"> ثابت</label>
+                </span>
+              </div>
+              <div class="flex items-center justify-between pt-1">
+                <span class="font-bold">الديكور:</span>
+                <span class="flex gap-2 text-[11px]">
+                  <label><input type="radio" name="sheet_decor" id="decor_box" checked> بيت ستارة</label>
+                  <label><input type="radio" name="sheet_decor" id="decor_cornice"> كورنيشة</label>
+                  <label><input type="radio" name="sheet_decor" id="decor_regular"> سقف عادي</label>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- جدول القماش (مطابق تماماً للورقة: بدون أسعار) -->
+        <div class="mb-3">
+          <div class="text-xs font-bold mb-1">القماش:</div>
+          <table class="sheet-table">
+            <thead>
+              <tr>
+                <th class="w-16">نوع القماش</th>
+                <th class="w-16">الكود</th>
+                <th>الصنف</th>
+                <th class="w-14">الأمتار</th>
+                <th class="w-16">عدد العروض</th>
+                <th class="w-20">نوع التقصيص</th>
+                <th class="w-20">تطريز / أزرار</th>
+                <th class="w-14">تهديل</th>
+              </tr>
+            </thead>
+            <tbody id="sheet_fabric_rows">
+              <!-- تعبأ ديناميكياً -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- جدول الإكسسوار (الأعمدة من الورقة الأصلية) -->
+        <div class="mb-3">
+          <div class="text-xs font-bold mb-1">الإكسسوار:</div>
+          <table class="sheet-table text-[11px]">
+            <thead>
+              <tr>
+                <th>البند</th>
+                <th>طنب</th>
+                <th>رول</th>
+                <th>قانوني رول</th>
+                <th>شماطة</th>
+                <th>ماسورة</th>
+                <th>قضبان/ريل</th>
+                <th>نهاية</th>
+                <th>طبة</th>
+                <th>فلانشة</th>
+                <th>مسامير خابور</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="font-bold bg-slate-100">الكود</td>
+                <td id="acc_code_tanab">-</td>
+                <td id="acc_code_roll">-</td>
+                <td id="acc_code_qanun">-</td>
+                <td id="acc_code_shamat">-</td>
+                <td id="acc_code_pipe">-</td>
+                <td id="acc_code_rail">ويفي</td>
+                <td id="acc_code_end">-</td>
+                <td id="acc_code_plug">-</td>
+                <td id="acc_code_flange">-</td>
+                <td id="acc_code_screws">-</td>
+              </tr>
+              <tr>
+                <td class="font-bold bg-slate-100">العدد / متر</td>
+                <td id="acc_qty_tanab">-</td>
+                <td id="acc_qty_roll">-</td>
+                <td id="acc_qty_qanun">-</td>
+                <td id="acc_qty_shamat">2</td>
+                <td id="acc_qty_pipe">-</td>
+                <td id="acc_qty_rail" class="font-bold">3 م</td>
+                <td id="acc_qty_end">-</td>
+                <td id="acc_qty_plug">-</td>
+                <td id="acc_qty_flange">-</td>
+                <td id="acc_qty_screws">6</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- البلتكالة والحواشي وملاحظات المكتب الفني -->
+        <div class="grid grid-cols-2 gap-3 mb-3 text-xs">
+          <!-- ملاحظات المكتب الفني -->
+          <div class="border border-slate-900 rounded p-2">
+            <span class="font-bold block border-b pb-1 mb-1">ملاحظات المكتب الفني:</span>
+            <p id="sheet_technical_notes" class="text-[11px] text-slate-700 min-h-12 leading-relaxed">
+              يراعى تركيب محول الريل الكهربائي بجوار فتحة الكهرباء اليمنى، وترك مسافة 5 سم للتهوية.
+            </p>
+          </div>
+
+          <!-- البلتكالة والحواشي -->
+          <div class="border border-slate-900 rounded p-2 space-y-2">
+            <div class="flex items-center justify-between border-b pb-1">
+              <span class="font-bold">نوع البلتكالة:</span>
+              <span class="flex gap-2 text-[11px]">
+                <label><input type="radio" name="sheet_pelmet" id="pel_box" checked> تنجيد بوكس</label>
+                <label><input type="radio" name="sheet_pelmet" id="pel_weba"> اويبة</label>
+                <label><input type="radio" name="sheet_pelmet" id="pel_steel"> استانلس</label>
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-bold">المتر:</span>
+              <span id="sheet_pelmet_m" class="font-bold">3.2 م</span>
+            </div>
+            
+            <!-- جدول العقادة / الحواشي -->
+            <table class="sheet-table text-[10px] mt-1">
+              <thead>
+                <tr>
+                  <th>البند</th>
+                  <th>فرنشة</th>
+                  <th>شرابة أم جنب</th>
+                  <th>شرابة ديكور</th>
+                  <th>حزام</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="font-bold">العدد</td>
+                  <td id="tassel_fringe">-</td>
+                  <td id="tassel_side">-</td>
+                  <td id="tassel_decor">2</td>
+                  <td id="tassel_belt">2</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- التوقيعات الثلاثة مطابقة للورقة الأصلية -->
+        <div class="grid grid-cols-3 gap-4 pt-4 border-t-2 border-slate-900 text-center text-xs">
+          <div>
+            <span class="font-bold block mb-6">توقيع البائع</span>
+            <div class="border-b border-dashed border-slate-600 w-3/4 mx-auto"></div>
+          </div>
+          <div>
+            <span class="font-bold block mb-6">توقيع العميل</span>
+            <div class="border-b border-dashed border-slate-600 w-3/4 mx-auto"></div>
+          </div>
+          <div>
+            <span class="font-bold block mb-6">توقيع مدير التشغيل</span>
+            <div class="border-b border-dashed border-slate-600 w-3/4 mx-auto"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- التبويب 3: عرض السعر المعتمد (Quotation) -->
+    <!-- ======================================================== -->
+    <section id="tab-quoteSheet" class="tab-content hidden">
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6 flex items-center justify-between no-print">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">💰</span>
+          <div>
+            <h2 class="font-bold text-slate-800">عرض سعر الستائر والمستلزمات</h2>
+            <p class="text-xs text-slate-500">مستند تسعير رسمي مفصل بالغرف ومشتمل على البنود والخدمات والدفعات.</p>
+          </div>
+        </div>
+        <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2 rounded-lg text-sm shadow">
+          🖨️ طباعة عرض السعر
+        </button>
+      </div>
+
+      <div class="page-a4 max-w-4xl mx-auto bg-white shadow-xl p-8 border border-slate-200 rounded-lg">
+        <!-- ترويسة العرض -->
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <div>
+            <h1 class="text-2xl font-black text-indigo-950">عرض سعر ستائر مفصلة</h1>
+            <p class="text-xs text-slate-500 mt-1" id="quote_full_num">رقم العرض: S000102</p>
+          </div>
+          <div class="text-left text-xs space-y-1">
+            <div><span class="text-slate-500">التاريخ:</span> <span id="quote_date" class="font-bold"></span></div>
+            <div><span class="text-slate-500">صلاحية العرض:</span> <span class="font-bold">7 أيام</span></div>
+          </div>
+        </div>
+
+        <!-- جدول تفاصيل الغرف والبنود -->
+        <div id="quote_rooms_container" class="space-y-4 mb-6">
+          <!-- يملأ ديناميكياً -->
+        </div>
+
+        <!-- الإجماليات وشروط الدفع -->
+        <div class="grid grid-cols-2 gap-6 pt-4 border-t">
+          <div class="text-xs space-y-2 text-slate-600">
+            <h4 class="font-bold text-slate-800">شروط وأحكام العرض:</h4>
+            <p>• يبدأ التصنيع فور تحصيل دفعة المقدم وتأكيد المقاسات النهائية.</p>
+            <p>• مدة التوريد والتركيب 14 يوماً من تاريخ استلام المقدم.</p>
+            <p>• شروط الدفع: 50% مقدم عند التعاقد، والباقي عند إتمام التركيب والتسليم.</p>
+          </div>
+
+          <div class="bg-slate-50 p-4 rounded-lg border text-sm space-y-2">
+            <div class="flex justify-between">
+              <span>إجمالي البنود:</span>
+              <span id="quote_items_total" class="font-bold">0 ج.م</span>
+            </div>
+            <div class="flex justify-between text-rose-600">
+              <span>الخصم الإضافي:</span>
+              <span id="quote_discount_val">0 ج.م</span>
+            </div>
+            <div class="flex justify-between text-indigo-700">
+              <span>الخدمات (شحن وتركيب ومعاينة):</span>
+              <span id="quote_services_total">0 ج.م</span>
+            </div>
+            <div class="border-t pt-2 flex justify-between text-base font-black text-slate-900">
+              <span>الصافي النهائي:</span>
+              <span id="quote_net_total">0 ج.م</span>
+            </div>
+            <div class="flex justify-between text-emerald-700 font-bold">
+              <span>المقدم المدفوع:</span>
+              <span id="quote_advance_val">0 ج.م</span>
+            </div>
+            <div class="flex justify-between text-slate-700 font-bold border-t pt-1">
+              <span>المتبقي عند التسليم:</span>
+              <span id="quote_remaining_val">0 ج.م</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- التبويب 4: مراحل المبيعات والمهام (CRM Pipeline) -->
+    <!-- ======================================================== -->
+    <section id="tab-crm" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800">متابعة الفرص والمبيعات (CRM)</h2>
+          <p class="text-xs text-slate-500">إدارة دورة العميل من الفرصة وحتى التسليم والفيد باك وفق وثيقة التحليل.</p>
+        </div>
+      </div>
+
+      <!-- بطاقات مهام اليوم (Today's Tasks - Section 6) -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+        <div class="bg-rose-50 border border-rose-200 p-4 rounded-xl text-rose-900">
+          <span class="text-xs font-bold block mb-1">⚠️ مهام متأخرة</span>
+          <span class="text-2xl font-black" id="count_overdue">0</span>
+        </div>
+        <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl text-amber-900">
+          <span class="text-xs font-bold block mb-1">📅 مهام اليوم</span>
+          <span class="text-2xl font-black" id="count_today">0</span>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 p-4 rounded-xl text-blue-900">
+          <span class="text-xs font-bold block mb-1">❓ بدون موعد متابعة</span>
+          <span class="text-2xl font-black" id="count_no_followup">0</span>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-emerald-900">
+          <span class="text-xs font-bold block mb-1">⭐ فيد باك مطلوب</span>
+          <span class="text-2xl font-black" id="count_feedback">0</span>
+        </div>
+      </div>
+
+      <!-- مسار الفرص الكانبان -->
+      <div class="flex gap-4 overflow-x-auto pb-4" id="crm_pipeline_lanes">
+        <!-- تملأ ديناميكياً بأعمدة المراحل -->
+      </div>
+    </section>
+
+    <!-- ======================================================== -->
+    <!-- التبويب 5: مركز التكامل والربط مع أودو (Odoo APIs Hub) -->
+    <!-- ======================================================== -->
+    <section id="tab-odoo" class="tab-content hidden space-y-6">
+      
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+        <div class="flex items-center justify-between border-b pb-4 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <span class="text-2xl">🔌</span> مركز الربط والتكامل البرمجي مع أودو (Odoo REST & XML-RPC)
+            </h2>
+            <p class="text-xs text-slate-500">
+              جميع أوامر التشغيل وعروض الأسعار والعملاء مهيأة بحمولات JSON مطابقة لهياكل أودو 17 / 18.
+            </p>
+          </div>
+          <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-3 py-1 rounded-full border border-emerald-300">
+            OpenAPI 3.0 Ready
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+          <!-- الكود الجاهز لبايثون وأودو -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center justify-between">
+              <span>كود بايثون للربط المباشر مع أودو (XML-RPC):</span>
+              <button onclick="copyPythonCode()" class="text-xs bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-2 py-1 rounded border border-indigo-200 font-semibold">
+                📋 نسخ الكود
+              </button>
+            </h3>
+            <pre class="bg-slate-900 text-emerald-400 p-4 rounded-lg text-xs font-mono overflow-x-auto h-72" id="python_code_box">
+# كود ربط أودو مع تطبيق مصنع الستائر
+import xmlrpc.client
+import urllib.request
+import json
+
+ODOO_URL = 'http://localhost:8069'
+ODOO_DB = 'curtain_factory_db'
+ODOO_USER = 'admin'
+ODOO_PASSWORD = 'admin_password'
+
+CURTAIN_APP_URL = 'http://localhost:3000'
+
+# 1. جلب بيانات أمر التشغيل المهيأ لأودو
+req = urllib.request.urlopen(f"{CURTAIN_APP_URL}/api/v1/odoo/payload/job/1")
+job_payload = json.loads(req.read().decode('utf-8'))['payload']
+
+# 2. تسجيل الدخول في أودو
+common = xmlrpc.client.ServerProxy(f'{ODOO_URL}/xmlrpc/2/common')
+uid = common.authenticate(ODOO_DB, ODOO_USER, ODOO_PASSWORD, {})
+models = xmlrpc.client.ServerProxy(f'{ODOO_URL}/xmlrpc/2/object')
+
+# 3. إنشاء السجل داخل موديول curtain.job
+job_id = models.execute_kw(
+    ODOO_DB, uid, ODOO_PASSWORD,
+    'curtain.job', 'create',
+    [job_payload['values']]
+)
+print(f"تم ربط السجل بنجاح في أودو برقم: {job_id}")
+            </pre>
+          </div>
+
+          <!-- تجربة استدعاء الـ API الحي للحصول على كائن أودو -->
+          <div class="space-y-4">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center justify-between">
+              <span>حمولة أمر التشغيل المتوافقة مع أودو (Live JSON Payload):</span>
+              <button onclick="fetchOdooPayload()" class="text-xs bg-slate-100 text-slate-700 hover:bg-slate-200 px-2 py-1 rounded border font-semibold">
+                🔄 تحديث الحمولة
+              </button>
+            </h3>
+            <pre class="bg-slate-900 text-amber-300 p-4 rounded-lg text-xs font-mono overflow-x-auto h-72" id="odoo_payload_box">
+جاري جلب الحمولة الحية...
+            </pre>
+          </div>
+
+        </div>
+
+        <!-- قائمة روابط APIs المتاحة للتكامل -->
+        <div class="mt-6 border-t pt-4">
+          <h3 class="text-sm font-bold text-slate-800 mb-3">نقاط الوصول البرمجية المتاحة (REST Endpoints):</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-mono">
+            <div class="p-2.5 bg-slate-50 border rounded flex items-center justify-between">
+              <div><span class="text-emerald-700 font-bold">GET</span> /api/v1/customers</div>
+              <span class="text-slate-500 font-sans">قائمة العملاء مع كشف التكرار</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 border rounded flex items-center justify-between">
+              <div><span class="text-indigo-700 font-bold">POST</span> /api/v1/calculate</div>
+              <span class="text-slate-500 font-sans">محرك الحسابات الفوري للستائر</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 border rounded flex items-center justify-between">
+              <div><span class="text-emerald-700 font-bold">GET</span> /api/v1/jobs/:id</div>
+              <span class="text-slate-500 font-sans">أمر التشغيل بكامل تفاصيله</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 border rounded flex items-center justify-between">
+              <div><span class="text-amber-700 font-bold">GET</span> /api/v1/odoo/payload/job/:id</div>
+              <span class="text-slate-500 font-sans">حمولة أودو جاهزة لـ curtain.job</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 border rounded flex items-center justify-between">
+              <div><span class="text-amber-700 font-bold">GET</span> /api/v1/odoo/payload/sale-order/:id</div>
+              <span class="text-slate-500 font-sans">حمولة أودو جاهزة لـ sale.order</span>
+            </div>
+            <div class="p-2.5 bg-slate-50 border rounded flex items-center justify-between">
+              <div><span class="text-blue-700 font-bold">GET</span> /api/v1/backup/json</div>
+              <span class="text-slate-500 font-sans">تصدير قاعدة البيانات (القسم 13)</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

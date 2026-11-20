@@ -1,0 +1,218 @@
+/* public/style.css - تنسيقات مخصصة ودعم الطباعة A4 */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap');
+
+body {
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+/* تنسيقات شريط التمرير */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+/* لوحة الرسم التوضيحي للموديل */
+#sketchCanvas {
+  touch-action: none;
+  cursor: crosshair;
+  background-color: #ffffff;
+  border: 2px dashed #94a3b8;
+  border-radius: 8px;
+}
+
+/* ======================================================== */
+/* كروكي المعاينة البصرية والارتفاع المعماري (Visual Inspection Sketch) */
+/* ======================================================== */
+.wall-sketch-canvas {
+  background: #fdfdfd;
+  background-image: 
+    linear-gradient(to right, rgba(226, 232, 240, 0.6) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 232, 240, 0.6) 1px, transparent 1px);
+  background-size: 20px 20px;
+  position: relative;
+  border: 2px solid #334155;
+  border-radius: 12px;
+}
+
+/* خطوط الأبعاد المعمارية */
+.dim-line-h {
+  position: absolute;
+  height: 2px;
+  background-color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dim-line-h::before, .dim-line-h::after {
+  content: '';
+  position: absolute;
+  width: 2px;
+  height: 14px;
+  background-color: #0284c7;
+}
+.dim-line-h::before { left: 0; }
+.dim-line-h::after { right: 0; }
+
+.dim-line-v {
+  position: absolute;
+  width: 2px;
+  background-color: #0284c7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dim-line-v::before, .dim-line-v::after {
+  content: '';
+  position: absolute;
+  height: 2px;
+  width: 14px;
+  background-color: #0284c7;
+}
+.dim-line-v::before { top: 0; }
+.dim-line-v::after { bottom: 0; }
+
+/* حقول الإدخال الموزعة على الكروكي */
+.croquis-input {
+  background-color: #ffffff;
+  border: 2px solid #0284c7;
+  border-radius: 6px;
+  font-weight: 800;
+  color: #0369a1;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  transition: all 0.2s ease;
+  z-index: 20;
+}
+.croquis-input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+  outline: none;
+}
+.croquis-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #0284c7;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+/* تمثيل الشباك وباب البلكونة */
+.window-glass {
+  background: linear-gradient(135deg, rgba(186, 230, 253, 0.5) 0%, rgba(224, 242, 254, 0.8) 100%);
+  border: 4px solid #475569;
+  border-radius: 4px;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.window-sill {
+  height: 8px;
+  background: #334155;
+  border-radius: 2px;
+  width: 106%;
+  margin-right: -3%;
+}
+
+/* تمثيل بيت الستارة في السقف */
+.ceiling-pocket-visual {
+  background: repeating-linear-gradient(
+    45deg,
+    #fef3c7,
+    #fef3c7 8px,
+    #fde68a 8px,
+    #fde68a 16px
+  );
+  border: 2px dashed #d97706;
+  border-radius: 4px;
+}
+
+/* بطاقات لقاء العميل المريحة للموبايل */
+.mobile-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* تخصيص الطباعة لورقة A4 */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    font-size: 11pt;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .page-a4 {
+    width: 210mm;
+    min-height: 297mm;
+    padding: 10mm 15mm;
+    margin: 0 auto;
+    background: #ffffff;
+    box-shadow: none !important;
+    border: none !important;
+    page-break-after: always;
+  }
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+  th, td {
+    border: 1px solid #000000 !important;
+    padding: 4px 6px !important;
+  }
+}
+
+/* ورقة أمر التشغيل المشابهة للورقة الأصلية */
+.factory-sheet {
+  background: #ffffff;
+  border: 2px solid #0f172a;
+  border-radius: 6px;
+  padding: 16px;
+  color: #0f172a;
+}
+
+.sheet-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
+.sheet-table th, .sheet-table td {
+  border: 1px solid #1e293b;
+  padding: 4px 6px;
+}
+
+.sheet-table th {
+  background-color: #f1f5f9;
+  font-weight: 700;
+}
+
+.sheet-box-title {
+  display: inline-block;
+  border: 2px solid #0f172a;
+  border-radius: 12px;
+  padding: 4px 24px;
+  font-weight: 800;
+  font-size: 1.25rem;
+  background-color: #ffffff;
+}
